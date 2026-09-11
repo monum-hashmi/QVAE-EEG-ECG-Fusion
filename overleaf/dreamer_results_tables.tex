@@ -1,0 +1,151 @@
+\begin{table*}[!t]
+\centering
+\caption{Classical baseline performance on DREAMER under subject-independent evaluation. Values are mean $\pm$ standard deviation across folds.}
+\label{tab:dreamer_classical_results}
+\begin{tabular}{llllllll}
+\toprule
+Model & Input & Pairing & Accuracy & Macro-F1 & Bal. Acc. & MCC & AUROC \\
+\midrule
+    KNN
+Name: 1, dtype: str &     EEG
+Name: 1, dtype: str &     eeg_only
+Name: 1, dtype: str & 0.514 $\pm$ 0.040 & 0.467 $\pm$ 0.018 & 0.476 $\pm$ 0.021 & -0.049 $\pm$ 0.043 & 0.464 $\pm$ 0.037 \\
+    Logistic Regression
+Name: 7, dtype: str &     EEG
+Name: 7, dtype: str &     eeg_only
+Name: 7, dtype: str & 0.505 $\pm$ 0.057 & 0.490 $\pm$ 0.054 & 0.499 $\pm$ 0.056 & -0.002 $\pm$ 0.111 & 0.492 $\pm$ 0.062 \\
+    Random Forest
+Name: 13, dtype: str &     EEG
+Name: 13, dtype: str &     eeg_only
+Name: 13, dtype: str & 0.592 $\pm$ 0.041 & 0.451 $\pm$ 0.045 & 0.509 $\pm$ 0.023 & 0.029 $\pm$ 0.080 & 0.501 $\pm$ 0.042 \\
+    SVM-RBF
+Name: 19, dtype: str &     EEG
+Name: 19, dtype: str &     eeg_only
+Name: 19, dtype: str & 0.462 $\pm$ 0.076 & 0.381 $\pm$ 0.074 & 0.480 $\pm$ 0.008 & -0.076 $\pm$ 0.055 & 0.465 $\pm$ 0.020 \\
+    XGBoost
+Name: 25, dtype: str &     EEG
+Name: 25, dtype: str &     eeg_only
+Name: 25, dtype: str & 0.542 $\pm$ 0.038 & 0.477 $\pm$ 0.044 & 0.491 $\pm$ 0.033 & -0.022 $\pm$ 0.079 & 0.511 $\pm$ 0.025 \\
+    KNN
+Name: 0, dtype: str &     ECG
+Name: 0, dtype: str &     ecg_only
+Name: 0, dtype: str & 0.527 $\pm$ 0.042 & 0.481 $\pm$ 0.038 & 0.486 $\pm$ 0.039 & -0.027 $\pm$ 0.080 & 0.482 $\pm$ 0.060 \\
+    Logistic Regression
+Name: 6, dtype: str &     ECG
+Name: 6, dtype: str &     ecg_only
+Name: 6, dtype: str & 0.485 $\pm$ 0.049 & 0.479 $\pm$ 0.044 & 0.491 $\pm$ 0.042 & -0.020 $\pm$ 0.084 & 0.481 $\pm$ 0.060 \\
+    Random Forest
+Name: 12, dtype: str &     ECG
+Name: 12, dtype: str &     ecg_only
+Name: 12, dtype: str & 0.575 $\pm$ 0.033 & 0.470 $\pm$ 0.042 & 0.505 $\pm$ 0.027 & 0.011 $\pm$ 0.072 & 0.497 $\pm$ 0.068 \\
+    SVM-RBF
+Name: 18, dtype: str &     ECG
+Name: 18, dtype: str &     ecg_only
+Name: 18, dtype: str & 0.494 $\pm$ 0.055 & 0.481 $\pm$ 0.049 & 0.489 $\pm$ 0.044 & -0.023 $\pm$ 0.088 & 0.490 $\pm$ 0.065 \\
+    XGBoost
+Name: 24, dtype: str &     ECG
+Name: 24, dtype: str &     ecg_only
+Name: 24, dtype: str & 0.564 $\pm$ 0.044 & 0.484 $\pm$ 0.049 & 0.507 $\pm$ 0.033 & 0.016 $\pm$ 0.080 & 0.517 $\pm$ 0.064 \\
+    KNN
+Name: 2, dtype: str &     EEG--ECG
+Name: 2, dtype: str &     correct
+Name: 2, dtype: str & 0.540 $\pm$ 0.035 & 0.492 $\pm$ 0.028 & 0.498 $\pm$ 0.028 & -0.002 $\pm$ 0.060 & 0.491 $\pm$ 0.047 \\
+    Logistic Regression
+Name: 8, dtype: str &     EEG--ECG
+Name: 8, dtype: str &     correct
+Name: 8, dtype: str & 0.488 $\pm$ 0.062 & 0.475 $\pm$ 0.058 & 0.488 $\pm$ 0.044 & -0.027 $\pm$ 0.094 & 0.484 $\pm$ 0.050 \\
+    Random Forest
+Name: 14, dtype: str &     EEG--ECG
+Name: 14, dtype: str &     correct
+Name: 14, dtype: str & 0.587 $\pm$ 0.034 & 0.435 $\pm$ 0.040 & 0.502 $\pm$ 0.019 & 0.011 $\pm$ 0.079 & 0.514 $\pm$ 0.034 \\
+    SVM-RBF
+Name: 20, dtype: str &     EEG--ECG
+Name: 20, dtype: str &     correct
+Name: 20, dtype: str & 0.471 $\pm$ 0.056 & 0.464 $\pm$ 0.052 & 0.477 $\pm$ 0.046 & -0.047 $\pm$ 0.095 & 0.464 $\pm$ 0.068 \\
+    XGBoost
+Name: 26, dtype: str &     EEG--ECG
+Name: 26, dtype: str &     correct
+Name: 26, dtype: str & 0.550 $\pm$ 0.032 & 0.480 $\pm$ 0.028 & 0.497 $\pm$ 0.020 & -0.006 $\pm$ 0.048 & 0.499 $\pm$ 0.019 \\
+    KNN
+Name: 5, dtype: str &     EEG--ECG
+Name: 5, dtype: str &     wrong_trial
+Name: 5, dtype: str & 0.527 $\pm$ 0.050 & 0.491 $\pm$ 0.048 & 0.494 $\pm$ 0.051 & -0.010 $\pm$ 0.102 & 0.503 $\pm$ 0.053 \\
+    Logistic Regression
+Name: 11, dtype: str &     EEG--ECG
+Name: 11, dtype: str &     wrong_trial
+Name: 11, dtype: str & 0.486 $\pm$ 0.049 & 0.475 $\pm$ 0.038 & 0.482 $\pm$ 0.032 & -0.036 $\pm$ 0.065 & 0.477 $\pm$ 0.038 \\
+    Random Forest
+Name: 17, dtype: str &     EEG--ECG
+Name: 17, dtype: str &     wrong_trial
+Name: 17, dtype: str & 0.588 $\pm$ 0.039 & 0.435 $\pm$ 0.042 & 0.503 $\pm$ 0.020 & 0.013 $\pm$ 0.084 & 0.509 $\pm$ 0.035 \\
+    SVM-RBF
+Name: 23, dtype: str &     EEG--ECG
+Name: 23, dtype: str &     wrong_trial
+Name: 23, dtype: str & 0.486 $\pm$ 0.060 & 0.478 $\pm$ 0.053 & 0.484 $\pm$ 0.054 & -0.031 $\pm$ 0.108 & 0.478 $\pm$ 0.077 \\
+    XGBoost
+Name: 29, dtype: str &     EEG--ECG
+Name: 29, dtype: str &     wrong_trial
+Name: 29, dtype: str & 0.551 $\pm$ 0.026 & 0.483 $\pm$ 0.009 & 0.498 $\pm$ 0.009 & -0.003 $\pm$ 0.022 & 0.500 $\pm$ 0.014 \\
+    KNN
+Name: 3, dtype: str &     EEG--ECG
+Name: 3, dtype: str &     cross_subject_label_matched
+Name: 3, dtype: str & 0.637 $\pm$ 0.013 & 0.603 $\pm$ 0.021 & 0.604 $\pm$ 0.019 & 0.217 $\pm$ 0.037 & 0.653 $\pm$ 0.035 \\
+    Logistic Regression
+Name: 9, dtype: str &     EEG--ECG
+Name: 9, dtype: str &     cross_subject_label_matched
+Name: 9, dtype: str & 0.510 $\pm$ 0.032 & 0.499 $\pm$ 0.031 & 0.504 $\pm$ 0.034 & 0.008 $\pm$ 0.067 & 0.511 $\pm$ 0.040 \\
+    Random Forest
+Name: 15, dtype: str &     EEG--ECG
+Name: 15, dtype: str &     cross_subject_label_matched
+Name: 15, dtype: str & 0.591 $\pm$ 0.035 & 0.449 $\pm$ 0.038 & 0.508 $\pm$ 0.021 & 0.030 $\pm$ 0.080 & 0.520 $\pm$ 0.034 \\
+    SVM-RBF
+Name: 21, dtype: str &     EEG--ECG
+Name: 21, dtype: str &     cross_subject_label_matched
+Name: 21, dtype: str & 0.522 $\pm$ 0.040 & 0.509 $\pm$ 0.039 & 0.518 $\pm$ 0.038 & 0.035 $\pm$ 0.073 & 0.537 $\pm$ 0.041 \\
+    XGBoost
+Name: 27, dtype: str &     EEG--ECG
+Name: 27, dtype: str &     cross_subject_label_matched
+Name: 27, dtype: str & 0.584 $\pm$ 0.038 & 0.523 $\pm$ 0.028 & 0.534 $\pm$ 0.023 & 0.077 $\pm$ 0.054 & 0.568 $\pm$ 0.021 \\
+    KNN
+Name: 4, dtype: str &     EEG--ECG
+Name: 4, dtype: str &     cross_subject_unrestricted
+Name: 4, dtype: str & 0.550 $\pm$ 0.024 & 0.497 $\pm$ 0.019 & 0.505 $\pm$ 0.013 & 0.011 $\pm$ 0.029 & 0.500 $\pm$ 0.020 \\
+    Logistic Regression
+Name: 10, dtype: str &     EEG--ECG
+Name: 10, dtype: str &     cross_subject_unrestricted
+Name: 10, dtype: str & 0.501 $\pm$ 0.042 & 0.489 $\pm$ 0.038 & 0.493 $\pm$ 0.040 & -0.014 $\pm$ 0.079 & 0.488 $\pm$ 0.040 \\
+    Random Forest
+Name: 16, dtype: str &     EEG--ECG
+Name: 16, dtype: str &     cross_subject_unrestricted
+Name: 16, dtype: str & 0.592 $\pm$ 0.036 & 0.447 $\pm$ 0.039 & 0.508 $\pm$ 0.018 & 0.029 $\pm$ 0.071 & 0.505 $\pm$ 0.029 \\
+    SVM-RBF
+Name: 22, dtype: str &     EEG--ECG
+Name: 22, dtype: str &     cross_subject_unrestricted
+Name: 22, dtype: str & 0.508 $\pm$ 0.018 & 0.496 $\pm$ 0.010 & 0.502 $\pm$ 0.012 & 0.003 $\pm$ 0.023 & 0.502 $\pm$ 0.010 \\
+    XGBoost
+Name: 28, dtype: str &     EEG--ECG
+Name: 28, dtype: str &     cross_subject_unrestricted
+Name: 28, dtype: str & 0.559 $\pm$ 0.042 & 0.496 $\pm$ 0.043 & 0.509 $\pm$ 0.035 & 0.019 $\pm$ 0.079 & 0.527 $\pm$ 0.029 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table}[!t]
+\centering
+\caption{Pair-validity comparison on DREAMER. For each pairing condition, the best classical model is selected by mean Macro-F1.}
+\label{tab:dreamer_pair_validity_results}
+\begin{tabular}{llll}
+\toprule
+Pairing & Best Model & Macro-F1 & MCC \\
+\midrule
+correct &     KNN
+Name: 2, dtype: str & 0.492 $\pm$ 0.028 & -0.002 $\pm$ 0.060 \\
+cross_subject_label_matched &     KNN
+Name: 3, dtype: str & 0.603 $\pm$ 0.021 & 0.217 $\pm$ 0.037 \\
+cross_subject_unrestricted &     KNN
+Name: 4, dtype: str & 0.497 $\pm$ 0.019 & 0.011 $\pm$ 0.029 \\
+wrong_trial &     KNN
+Name: 5, dtype: str & 0.491 $\pm$ 0.048 & -0.010 $\pm$ 0.102 \\
+\bottomrule
+\end{tabular}
+\end{table}

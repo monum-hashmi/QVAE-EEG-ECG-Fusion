@@ -1,0 +1,55 @@
+% Copy these tables into Section VI after experiments.
+
+\begin{table*}[!t]
+\centering
+\caption{Main subject-independent performance comparison on DREAMER. Values should be reported as mean $\pm$ standard deviation across folds.}
+\label{tab:dreamer_main_results}
+\begin{tabular}{llllllll}
+\toprule
+Model & Input & Pairing & Accuracy & Macro-F1 & Bal. Acc. & MCC & AUROC \\
+\midrule
+SVM & EEG & N/A & -- & -- & -- & -- & -- \\
+SVM & ECG & N/A & -- & -- & -- & -- & -- \\
+SVM & EEG--ECG & Correct & -- & -- & -- & -- & -- \\
+Random Forest & EEG--ECG & Correct & -- & -- & -- & -- & -- \\
+XGBoost & EEG--ECG & Correct & -- & -- & -- & -- & -- \\
+CNN--LSTM & EEG--ECG & Correct & -- & -- & -- & -- & -- \\
+EEGNet & EEG & N/A & -- & -- & -- & -- & -- \\
+VAE & EEG--ECG & Correct & -- & -- & -- & -- & -- \\
+QVAE & EEG--ECG & Correct & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table}[!t]
+\centering
+\caption{Pair-validity ablation for QVAE.}
+\label{tab:qvae_pair_validity}
+\begin{tabular}{llll}
+\toprule
+Pairing & Accuracy & Macro-F1 & MCC \\
+\midrule
+Correct same-subject/same-trial & -- & -- & -- \\
+Same-subject wrong-trial & -- & -- & -- \\
+Cross-subject label-matched & -- & -- & -- \\
+Cross-subject unrestricted & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!t]
+\centering
+\caption{Computational cost comparison.}
+\label{tab:compute_cost}
+\begin{tabular}{llll}
+\toprule
+Model & Parameters & Train Time & Inference Time \\
+\midrule
+SVM & -- & -- & -- \\
+XGBoost & -- & -- & -- \\
+CNN--LSTM & -- & -- & -- \\
+VAE & -- & -- & -- \\
+QVAE & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,19 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# IDE files
+.vscode/
+.idea/
+
+# Windows files
+desktop.ini
+
+# Dataset (do not upload)
+data/DREAMER.mat
+
+# Logs
+*.log

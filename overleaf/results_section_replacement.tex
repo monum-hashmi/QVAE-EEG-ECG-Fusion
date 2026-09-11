@@ -1,0 +1,23 @@
+\section{Results and Discussion}
+
+\subsection{Classification Performance}
+
+Table~\ref{tab:dreamer_main_results} reports the main subject-independent classification performance on DREAMER. The comparison includes classical machine learning, deep learning, representation-learning, EEG-specific, and quantum models under identical subject-wise folds. Macro-F1 is treated as the primary selection metric because affective-state labels may be imbalanced across subjects and trials.
+
+% Paste generated result table here.
+
+\subsection{Pair-Validity Analysis}
+
+Table~\ref{tab:qvae_pair_validity} compares QVAE performance under correct same-subject/same-trial EEG--ECG pairing and deliberately broken pairings. If the correct pairing condition outperforms wrong-trial and cross-subject conditions, the result supports the presence of useful synchronized multimodal information. If performance remains similar across correct and broken pairings, the multimodal gain is more likely to reflect dataset-level co-patterning rather than subject-specific brain--heart coupling.
+
+\subsection{Quantum Versus Classical Latent Models}
+
+QVAE is compared with Autoencoder and VAE baselines to determine whether quantum latent transformation provides benefits beyond classical latent-variable modelling. Any claim of quantum advantage is made only if QVAE improves predictive performance, reconstruction quality, calibration, or parameter efficiency under matched validation settings.
+
+\subsection{Computational Cost}
+
+Table~\ref{tab:compute_cost} reports model size, training time, inference time, and quantum-circuit configuration. This is essential because a small accuracy gain is not practically meaningful if the quantum model requires substantially higher computational cost.
+
+\subsection{Discussion}
+
+The discussion interprets whether the results support physiologically valid EEG--ECG fusion. Correct-pair improvement over shuffled controls would support synchronized brain--heart information. Similar performance across valid and invalid pairings would suggest that the QVAE fusion benefit is caused by aggregate modality-level patterns rather than true subject-specific coupling.
