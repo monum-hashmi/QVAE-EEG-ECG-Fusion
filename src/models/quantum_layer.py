@@ -70,4 +70,4 @@ class QuantumLayer(nn.Module):
                 )
             )
 
-        return torch.stack(outputs)
+        return torch.stack(outputs).float()
