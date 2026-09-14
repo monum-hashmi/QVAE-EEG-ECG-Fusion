@@ -1,6 +1,7 @@
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
+from sklearn.preprocessing import StandardScaler
 
 
 class DREAMERDataset(Dataset):
@@ -19,14 +20,25 @@ class DREAMERDataset(Dataset):
             if c.startswith("ecg_")
         ]
 
-        self.eeg = self.df[self.eeg_cols].fillna(0).values
-        self.ecg = self.df[self.ecg_cols].fillna(0).values
 
+        # Load EEG and ECG features
+        eeg = self.df[self.eeg_cols].fillna(0).values
+        ecg = self.df[self.ecg_cols].fillna(0).values
+
+
+        # Normalize features
+        self.eeg = StandardScaler().fit_transform(eeg)
+        self.ecg = StandardScaler().fit_transform(ecg)
+
+
+        # Labels
         self.labels = self.df["label"].values
+
 
 
     def __len__(self):
         return len(self.df)
+
 
 
     def __getitem__(self, idx):
