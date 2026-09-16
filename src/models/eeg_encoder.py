@@ -4,21 +4,29 @@ import torch.nn as nn
 
 class EEGEncoder(nn.Module):
 
-    def __init__(self, input_dim=70, latent_dim=64):
+    def __init__(self):
         super().__init__()
 
         self.encoder = nn.Sequential(
-            nn.Linear(input_dim, 128),
-            nn.BatchNorm1d(128),
-            nn.GELU(),
-            nn.Dropout(0.2),
 
-            nn.Linear(128, 64),
-            nn.GELU(),
+            nn.Linear(70, 256),
+            nn.LayerNorm(256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
 
-            nn.Linear(64, latent_dim)
+
+            nn.Linear(256,128),
+            nn.LayerNorm(128),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+
+
+            nn.Linear(128,64),
+            nn.LayerNorm(64)
+
         )
 
 
-    def forward(self, x):
+    def forward(self,x):
+
         return self.encoder(x)
