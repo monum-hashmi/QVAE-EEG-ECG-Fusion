@@ -11,12 +11,16 @@ class CrossAttentionFusion(nn.Module):
     ):
         super().__init__()
 
+
+        # EEG attends to ECG
         self.eeg_to_ecg_attention = nn.MultiheadAttention(
             embed_dim=latent_dim,
             num_heads=num_heads,
             batch_first=True
         )
 
+
+        # ECG attends to EEG
         self.ecg_to_eeg_attention = nn.MultiheadAttention(
             embed_dim=latent_dim,
             num_heads=num_heads,
@@ -28,8 +32,16 @@ class CrossAttentionFusion(nn.Module):
         self.norm2 = nn.LayerNorm(latent_dim)
 
 
+        # Residual fusion:
+        # EEG attended (64)
+        # ECG attended (64)
+        # Original EEG (64)
+        # Original ECG (64)
+        #
+        # Total = 256 features
+
         self.fusion_layer = nn.Sequential(
-            nn.Linear(latent_dim * 2, 128),
+            nn.Linear(latent_dim * 4, 128),
             nn.ReLU(),
             nn.Dropout(0.2),
             nn.Linear(128, latent_dim)
@@ -37,7 +49,7 @@ class CrossAttentionFusion(nn.Module):
 
 
         self.weight_layer = nn.Sequential(
-            nn.Linear(latent_dim * 2, 2),
+            nn.Linear(latent_dim * 4, 2),
             nn.Softmax(dim=1)
         )
 
@@ -48,12 +60,17 @@ class CrossAttentionFusion(nn.Module):
         ecg_features
     ):
 
+
         # Add sequence dimension
+        # [batch,64] -> [batch,1,64]
+
         eeg = eeg_features.unsqueeze(1)
         ecg = ecg_features.unsqueeze(1)
 
 
-        # EEG attends to ECG
+
+        # EEG queries ECG information
+
         eeg_attended, _ = self.eeg_to_ecg_attention(
             eeg,
             ecg,
@@ -61,13 +78,18 @@ class CrossAttentionFusion(nn.Module):
         )
 
 
-        # ECG attends to EEG
+
+        # ECG queries EEG information
+
         ecg_attended, _ = self.ecg_to_eeg_attention(
             ecg,
             eeg,
             eeg
         )
 
+
+
+        # Residual connections
 
         eeg_out = self.norm1(
             eeg + eeg_attended
@@ -79,19 +101,29 @@ class CrossAttentionFusion(nn.Module):
         ).squeeze(1)
 
 
+
+        # Residual multimodal representation
+
         combined = torch.cat(
             [
                 eeg_out,
-                ecg_out
+                ecg_out,
+                eeg_features,
+                ecg_features
             ],
             dim=1
         )
 
 
+
+        # Final fused representation
+
         fused = self.fusion_layer(
             combined
         )
 
+
+        # Modality importance weights
 
         weights = self.weight_layer(
             combined
