@@ -1,0 +1,43 @@
+QVAE EEG-ECG Fusion Model - Baseline Results
+
+Dataset:
+DREAMER Dataset
+
+Samples:
+16560
+
+Task:
+Binary Valence Classification
+
+
+Architecture:
+EEG Encoder
+ECG Encoder
+Attention Fusion
+Quantum Variational Layer
+Classifier
+
+
+Training Configuration:
+
+Optimizer: AdamW
+Loss Function: Focal Loss
+Epochs: 20
+GPU: NVIDIA GeForce RTX 5060 Laptop GPU
+
+
+Performance:
+
+Accuracy: 70.62%
+
+Precision: 68.69%
+
+Recall: 46.86%
+
+F1 Score: 55.71%
+
+
+Confusion Matrix:
+
+[[1727, 279],
+ [694, 612]]
