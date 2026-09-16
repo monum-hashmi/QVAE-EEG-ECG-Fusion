@@ -80,7 +80,12 @@ model = QVAE().to(DEVICE)
 # Loss
 # =========================
 
-criterion = nn.CrossEntropyLoss()
+from src.models.focal_loss import FocalLoss
+
+criterion = FocalLoss(
+    alpha=0.5,
+    gamma=2
+)
 
 
 
