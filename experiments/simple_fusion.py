@@ -8,6 +8,8 @@ sys.path.append(
         )
     )
 )
+
+
 import torch
 import torch.nn as nn
 
@@ -26,36 +28,62 @@ if DEVICE == "cuda":
     print(torch.cuda.get_device_name(0))
 
 
-# ============================
-# EEG ONLY MODEL
-# ============================
+# =========================
+# Simple EEG + ECG Fusion
+# =========================
 
-class EEGOnlyModel(nn.Module):
+class SimpleFusionModel(nn.Module):
 
     def __init__(self):
         super().__init__()
 
-        self.encoder = EEGEncoder()
+
+        self.eeg_encoder = EEGEncoder()
+
+        self.ecg_encoder = ECGEncoder()
+
 
         self.classifier = nn.Sequential(
-            nn.Linear(64, 32),
+
+            nn.Linear(128, 64),
+
             nn.ReLU(),
+
             nn.Dropout(0.2),
-            nn.Linear(32, 2)
+
+            nn.Linear(64, 2)
+
         )
 
 
-    def forward(self, eeg):
+    def forward(self, eeg, ecg):
 
-        x = self.encoder(eeg)
+        eeg_features = self.eeg_encoder(eeg)
 
-        return self.classifier(x)
+        ecg_features = self.ecg_encoder(ecg)
+
+
+        fused = torch.cat(
+            [
+                eeg_features,
+                ecg_features
+            ],
+            dim=1
+        )
+
+
+        prediction = self.classifier(
+            fused
+        )
+
+
+        return prediction
 
 
 
-# ============================
+# =========================
 # Dataset
-# ============================
+# =========================
 
 dataset = DREAMERDataset(
     "data/dreamer_features/dreamer_valence_paired_all.csv"
@@ -63,6 +91,7 @@ dataset = DREAMERDataset(
 
 
 train_size = int(0.8 * len(dataset))
+
 val_size = len(dataset) - train_size
 
 
@@ -87,14 +116,15 @@ val_loader = DataLoader(
 
 
 
-# ============================
-# Training
-# ============================
+# =========================
+# Model
+# =========================
 
-model = EEGOnlyModel().to(DEVICE)
+model = SimpleFusionModel().to(DEVICE)
 
 
 criterion = nn.CrossEntropyLoss()
+
 
 optimizer = torch.optim.AdamW(
     model.parameters(),
@@ -103,30 +133,45 @@ optimizer = torch.optim.AdamW(
 )
 
 
+
 epochs = 20
 
 best_acc = 0
 
 
+
+# =========================
+# Training
+# =========================
+
 for epoch in range(epochs):
 
     model.train()
 
+    total_loss = 0
+
     correct = 0
+
     total = 0
-    loss_total = 0
 
 
     for eeg, ecg, labels in train_loader:
 
+
         eeg = eeg.to(DEVICE)
+
+        ecg = ecg.to(DEVICE)
+
         labels = labels.to(DEVICE)
 
 
         optimizer.zero_grad()
 
 
-        output = model(eeg)
+        output = model(
+            eeg,
+            ecg
+        )
 
 
         loss = criterion(
@@ -140,7 +185,7 @@ for epoch in range(epochs):
         optimizer.step()
 
 
-        loss_total += loss.item()
+        total_loss += loss.item()
 
 
         pred = torch.argmax(
@@ -149,7 +194,11 @@ for epoch in range(epochs):
         )
 
 
-        correct += (pred == labels).sum().item()
+        correct += (
+            pred == labels
+        ).sum().item()
+
+
         total += labels.size(0)
 
 
@@ -162,19 +211,27 @@ for epoch in range(epochs):
 
     model.eval()
 
-    correct = 0
-    total = 0
+    val_correct = 0
+
+    val_total = 0
 
 
     with torch.no_grad():
 
         for eeg, ecg, labels in val_loader:
 
+
             eeg = eeg.to(DEVICE)
+
+            ecg = ecg.to(DEVICE)
+
             labels = labels.to(DEVICE)
 
 
-            output = model(eeg)
+            output = model(
+                eeg,
+                ecg
+            )
 
 
             pred = torch.argmax(
@@ -183,19 +240,24 @@ for epoch in range(epochs):
             )
 
 
-            correct += (pred == labels).sum().item()
-            total += labels.size(0)
+            val_correct += (
+                pred == labels
+            ).sum().item()
+
+
+            val_total += labels.size(0)
 
 
 
-    val_acc = 100 * correct / total
+    val_acc = 100 * val_correct / val_total
+
 
 
     print(
         f"Epoch {epoch+1}/{epochs} | "
-        f"Loss: {loss_total:.4f} | "
-        f"Train: {train_acc:.2f}% | "
-        f"Val: {val_acc:.2f}%"
+        f"Loss: {total_loss:.4f} | "
+        f"Train Acc: {train_acc:.2f}% | "
+        f"Val Acc: {val_acc:.2f}%"
     )
 
 
@@ -203,10 +265,15 @@ for epoch in range(epochs):
 
         best_acc = val_acc
 
+
         torch.save(
             model.state_dict(),
-            "experiments/eeg_only/best_eeg_only.pth"
+            "experiments/simple_fusion/best_simple_fusion.pth"
         )
 
 
-print("\nBest EEG Only Accuracy:", best_acc)
+
+print(
+    "\nBest Simple Fusion Accuracy:",
+    best_acc
+)

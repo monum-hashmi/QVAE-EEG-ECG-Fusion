@@ -1,0 +1,18 @@
+Cross Attention QVAE Results
+
+Dataset:
+DREAMER Valence Classification
+
+Accuracy: 71.7391%
+
+Precision: 74.6667%
+
+Recall: 42.8790%
+
+F1-score: 54.4747%
+
+
+Confusion Matrix:
+
+[[1816 190]
+ [746 560]]
