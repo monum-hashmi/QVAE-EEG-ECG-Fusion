@@ -127,7 +127,7 @@ scaler = torch.cuda.amp.GradScaler(
 # Training
 # =========================
 
-epochs = 20
+epochs = 40
 
 best_accuracy = 0
 
