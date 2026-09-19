@@ -1,3 +1,13 @@
+import sys
+import os
+
+sys.path.append(
+    os.path.dirname(
+        os.path.dirname(
+            os.path.abspath(__file__)
+        )
+    )
+)
 import torch
 import torch.nn as nn
 
@@ -143,6 +153,10 @@ epochs = 40
 
 best_accuracy = 0
 
+train_history = []
+val_history = []
+loss_history = []
+
 
 for epoch in range(epochs):
 
@@ -282,7 +296,9 @@ for epoch in range(epochs):
         f"Train Acc: {train_accuracy:.2f}% | "
         f"Val Acc: {val_accuracy:.2f}%"
     )
-
+    train_history.append(train_accuracy)
+    val_history.append(val_accuracy)
+    loss_history.append(total_loss)
 
 
     # Save best model
@@ -310,4 +326,37 @@ print("\nTraining Completed")
 print(
     f"Seed {SEED} Best Validation Accuracy:",
     best_accuracy
+)
+
+# =========================
+# Save Training History
+# =========================
+
+import json
+
+
+history = {
+    "seed": SEED,
+    "train_accuracy": train_history,
+    "val_accuracy": val_history,
+    "loss": loss_history,
+    "best_validation_accuracy": best_accuracy
+}
+
+
+with open(
+    f"results/training_history_seed_{SEED}.json",
+    "w"
+) as f:
+
+    json.dump(
+        history,
+        f,
+        indent=4
+    )
+
+
+print(
+    "Training history saved:",
+    f"results/training_history_seed_{SEED}.json"
 )
