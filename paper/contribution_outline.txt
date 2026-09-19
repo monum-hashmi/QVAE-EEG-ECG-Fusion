@@ -1,0 +1,41 @@
+Paper Contribution Outline
+
+Title Direction:
+Quantum Variational Autoencoder Based Cross-Attention Multimodal EEG-ECG Fusion for Emotion Recognition
+
+
+Main Contributions:
+
+1. Multimodal Fusion Framework
+- Develop an EEG-ECG fusion architecture combining modality-specific encoders with cross-modal attention.
+- Enables adaptive interaction between physiological modalities.
+
+
+2. Quantum Latent Representation Learning
+- Introduce a quantum bottleneck after multimodal fusion.
+- Investigate whether quantum-inspired latent transformation improves representation learning.
+
+
+3. Comprehensive Ablation Study
+- Compare:
+  EEG-only
+  ECG-only
+  Simple fusion
+  Attention fusion
+  Classical bottleneck
+  MLP bottleneck
+  Cross-attention without quantum
+  Proposed QVAE model
+
+
+4. Robustness Evaluation
+- Perform multi-seed evaluation.
+- Analyze validity under:
+  Correct pairing
+  Same-subject wrong trial pairing
+  Cross-subject pairing
+
+
+5. Experimental Validation
+- Demonstrate stable performance across multiple random seeds.
+- Provide quantitative analysis of each architectural component.
