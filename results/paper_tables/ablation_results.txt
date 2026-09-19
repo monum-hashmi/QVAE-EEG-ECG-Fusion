@@ -1,0 +1,8 @@
+Ablation Study Results
+
+Configuration                  Accuracy
+
+Classical Bottleneck           60.57%
+MLP Bottleneck                 71.44%
+Cross Attention No Quantum     72.19%
+Quantum Cross Attention        72.28%

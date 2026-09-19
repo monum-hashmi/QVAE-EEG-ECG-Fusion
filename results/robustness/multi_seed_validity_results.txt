@@ -1,0 +1,11 @@
+Multi-Seed Validity Robustness Evaluation
+
+Model:
+Quantum Variational Autoencoder with Cross Attention Fusion
+
+
+| Evaluation Condition | Seed 42 | Seed 52 | Seed 62 | Mean ± Std |
+|----------------------|---------|---------|---------|------------|
+| Valid EEG-ECG Pairing | 73.91 | 69.61 | 73.46 | 72.33 ± 2.40 |
+| Same Subject Wrong Trial | 67.95 | 67.32 | 69.04 | 68.10 ± 0.92 |
+| Cross Subject Pairing | 67.15 | 67.43 | 68.36 | 67.65 ± 0.64 |

@@ -1,0 +1,10 @@
+Baseline Comparison Results
+
+Model                          Accuracy
+
+EEG Only                       68.72%
+ECG Only                       63.80%
+Simple Fusion                  69.47%
+Attention Fusion               69.35%
+Cross Attention No Quantum     72.19%
+QVAE Cross Attention           72.28% (Seed 52)

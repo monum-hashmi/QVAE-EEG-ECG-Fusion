@@ -1,5 +1,7 @@
 import sys
 import os
+import argparse
+import torch
 
 sys.path.append(
     os.path.dirname(
@@ -9,11 +11,26 @@ sys.path.append(
     )
 )
 
-import torch
 from torch.utils.data import DataLoader
-
 from src.data.dreamer_dataset import DREAMERDataset
 from src.models.qvae import QVAE
+
+
+# =========================
+# Seed Argument
+# =========================
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    "--seed",
+    type=int,
+    default=42
+)
+
+args = parser.parse_args()
+
+SEED = args.seed
 
 
 
@@ -31,24 +48,33 @@ if DEVICE == "cuda":
 
 
 # =========================
-# Load trained QVAE
+# Load Model
 # =========================
 
 model = QVAE().to(DEVICE)
 
 
+model_path = (
+    f"experiments/qvae_cross_attention/"
+    f"best_qvae_cross_attention_seed_{SEED}.pth"
+)
+
+
 model.load_state_dict(
     torch.load(
-        "best_qvae_model.pth",
+        model_path,
         map_location=DEVICE
     )
 )
 
 
+print(
+    "Loaded model:",
+    model_path
+)
+
+
 model.eval()
-
-
-print("Loaded QVAE model")
 
 
 
@@ -56,38 +82,18 @@ print("Loaded QVAE model")
 # Evaluation Function
 # =========================
 
-def evaluate(dataset_path):
-
-
-    dataset = DREAMERDataset(
-        dataset_path
-    )
-
-
-    loader = DataLoader(
-        dataset,
-        batch_size=32,
-        shuffle=False
-    )
-
+def evaluate(loader):
 
     correct = 0
-
     total = 0
-
-
 
     with torch.no_grad():
 
         for eeg, ecg, labels in loader:
 
-
             eeg = eeg.to(DEVICE)
-
             ecg = ecg.to(DEVICE)
-
             labels = labels.to(DEVICE)
-
 
 
             output = model(
@@ -96,64 +102,106 @@ def evaluate(dataset_path):
             )
 
 
-            prediction = torch.argmax(
+            predictions = torch.argmax(
                 output["prediction"],
                 dim=1
             )
 
 
             correct += (
-                prediction == labels
+                predictions == labels
             ).sum().item()
 
 
             total += labels.size(0)
 
 
-
-    accuracy = (
+    return (
         100 * correct / total
     )
 
 
-    return accuracy
-
-
 
 # =========================
-# Run Validity Tests
+# Load Validity Datasets
 # =========================
 
-
-tests = {
-
-    "Valid Pairing":
-    "data/dreamer_features/dreamer_valence_paired_all.csv",
+valid_dataset = DREAMERDataset(
+    "data/dreamer_features/dreamer_valence_paired_all.csv"
+)
 
 
-    "Same Subject Wrong Trial":
-    "data/validity_experiments/dreamer_wrong_trial.csv",
+wrong_trial_dataset = DREAMERDataset(
+    "data/validity_experiments/dreamer_wrong_trial.csv"
+)
 
 
-    "Cross Subject":
+cross_subject_dataset = DREAMERDataset(
     "data/validity_experiments/dreamer_cross_subject.csv"
-
-}
-
-
-
-print("\n========== Validity Evaluation ==========\n")
+)
 
 
 
-for name,path in tests.items():
+valid_loader = DataLoader(
+    valid_dataset,
+    batch_size=32,
+    shuffle=False
+)
 
-    acc = evaluate(path)
 
-    print(
-        f"{name}: {acc:.2f}%"
-    )
+wrong_trial_loader = DataLoader(
+    wrong_trial_dataset,
+    batch_size=32,
+    shuffle=False
+)
 
+
+cross_subject_loader = DataLoader(
+    cross_subject_dataset,
+    batch_size=32,
+    shuffle=False
+)
+
+
+
+# =========================
+# Results
+# =========================
+
+print(
+    "\n========== Validity Evaluation =========="
+)
+
+
+valid_accuracy = evaluate(
+    valid_loader
+)
+
+
+wrong_accuracy = evaluate(
+    wrong_trial_loader
+)
+
+
+cross_accuracy = evaluate(
+    cross_subject_loader
+)
+
+
+
+print(
+    f"Valid Pairing: {valid_accuracy:.2f}%"
+)
+
+
+print(
+    f"Same Subject Wrong Trial: {wrong_accuracy:.2f}%"
+)
+
+
+print(
+    f"Cross Subject: {cross_accuracy:.2f}%"
+)
 
 
 print(

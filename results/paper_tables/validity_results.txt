@@ -1,0 +1,7 @@
+Validity Evaluation Results
+
+Condition                       Mean ± Std
+
+Valid EEG-ECG Pairing           72.33 ± 2.40%
+Same Subject Wrong Trial        68.10 ± 0.92%
+Cross Subject Pairing           67.65 ± 0.64%

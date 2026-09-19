@@ -11,7 +11,19 @@ from src.models.qvae import QVAE
 # Reproducibility
 # =========================
 
-SEED = 42
+import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    "--seed",
+    type=int,
+    default=42
+)
+
+args = parser.parse_args()
+
+SEED = args.seed
 
 torch.manual_seed(SEED)
 
@@ -282,9 +294,9 @@ for epoch in range(epochs):
 
 
         torch.save(
-            model.state_dict(),
-            "experiments/qvae_cross_attention/best_qvae_cross_attention.pth"
-        )
+    		model.state_dict(),
+    		f"experiments/qvae_cross_attention/best_qvae_cross_attention_seed_{SEED}.pth"
+	)
 
 
         print(
@@ -296,6 +308,6 @@ for epoch in range(epochs):
 print("\nTraining Completed")
 
 print(
-    "Best Validation Accuracy:",
+    f"Seed {SEED} Best Validation Accuracy:",
     best_accuracy
 )
