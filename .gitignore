@@ -17,3 +17,6 @@ data/DREAMER.mat
 
 # Logs
 *.log
+
+# Model checkpoints
+*.pth
