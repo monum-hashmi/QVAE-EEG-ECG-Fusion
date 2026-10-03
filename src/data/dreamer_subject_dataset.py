@@ -9,7 +9,6 @@ class DREAMERSubjectDataset(Dataset):
     def __init__(
         self,
         csv_file,
-        train_subjects,
         target_subjects,
         eeg_scaler=None,
         ecg_scaler=None,
@@ -18,25 +17,19 @@ class DREAMERSubjectDataset(Dataset):
 
         self.df = pd.read_csv(csv_file)
 
-        # -------------------------------------------------
-        # Keep ONLY correct EEG-ECG pairings
-        # -------------------------------------------------
+        # Keep only correctly paired samples
         self.df = self.df[
             self.df["pairing"] == "correct"
         ].reset_index(drop=True)
 
-        # -------------------------------------------------
-        # Select subjects
-        # -------------------------------------------------
+        # Select requested subjects
         if target_subjects is not None:
 
             self.df = self.df[
                 self.df["subject_id"].isin(target_subjects)
             ].reset_index(drop=True)
 
-        # -------------------------------------------------
         # Feature columns
-        # -------------------------------------------------
         self.eeg_cols = [
             c for c in self.df.columns
             if c.startswith("eeg_")
@@ -47,9 +40,7 @@ class DREAMERSubjectDataset(Dataset):
             if c.startswith("ecg_")
         ]
 
-        # -------------------------------------------------
         # Raw features
-        # -------------------------------------------------
         eeg = (
             self.df[self.eeg_cols]
             .fillna(0)
@@ -62,15 +53,14 @@ class DREAMERSubjectDataset(Dataset):
             .values
         )
 
-        # -------------------------------------------------
         # Scalers
-        # -------------------------------------------------
         if eeg_scaler is None:
             eeg_scaler = StandardScaler()
 
         if ecg_scaler is None:
             ecg_scaler = StandardScaler()
 
+        # Fit only on training subjects
         if fit_scalers:
 
             self.eeg = eeg_scaler.fit_transform(eeg)
@@ -84,19 +74,16 @@ class DREAMERSubjectDataset(Dataset):
         self.eeg_scaler = eeg_scaler
         self.ecg_scaler = ecg_scaler
 
-        # -------------------------------------------------
         # Labels
-        # -------------------------------------------------
         self.labels = self.df["label"].values
 
-        # -------------------------------------------------
         # Metadata
-        # -------------------------------------------------
         self.subject_ids = self.df["subject_id"].values
         self.trial_ids = self.df["trial_id"].values
         self.window_ids = self.df["window_id"].values
 
     def __len__(self):
+
         return len(self.df)
 
     def __getitem__(self, idx):

@@ -25,7 +25,7 @@ from src.models.qvae import QVAE
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 CSV = "data/dreamer_features/dreamer_valence_paired_all.csv"
-MODEL = "experiments/qvae_clean_baseline/best_qvae_clean_seed_42.pth"
+MODEL = "results/clean_baseline/clean_baseline_seed_42.pth"
 
 TRAIN_SUBJECTS = list(range(1, 19))
 VAL_SUBJECTS = list(range(19, 24))
@@ -37,14 +37,12 @@ VAL_SUBJECTS = list(range(19, 24))
 
 train_dataset = DREAMERSubjectDataset(
     CSV,
-    train_subjects=TRAIN_SUBJECTS,
     target_subjects=TRAIN_SUBJECTS,
     fit_scalers=True
 )
 
 val_dataset = DREAMERSubjectDataset(
     CSV,
-    train_subjects=TRAIN_SUBJECTS,
     target_subjects=VAL_SUBJECTS,
     eeg_scaler=train_dataset.eeg_scaler,
     ecg_scaler=train_dataset.ecg_scaler,

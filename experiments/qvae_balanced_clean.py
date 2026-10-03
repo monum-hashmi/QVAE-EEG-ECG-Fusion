@@ -18,13 +18,14 @@ from torch.utils.data import DataLoader
 
 from src.data.dreamer_subject_dataset import DREAMERSubjectDataset
 from src.models.qvae import QVAE
-from src.models.focal_loss import FocalLoss
+from src.models.balanced_focal_loss import BalancedFocalLoss
 
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
     balanced_accuracy_score,
-    matthews_corrcoef
+    matthews_corrcoef,
+    confusion_matrix
 )
 
 
@@ -46,7 +47,6 @@ args = parser.parse_args()
 
 SEED = args.seed
 
-
 random.seed(SEED)
 np.random.seed(SEED)
 torch.manual_seed(SEED)
@@ -63,7 +63,7 @@ if torch.cuda.is_available():
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 print("=" * 70)
-print("Clean Subject-Independent QVAE Baseline")
+print("BALANCED CLEAN SUBJECT-INDEPENDENT QVAE")
 print("=" * 70)
 
 print("Seed:", SEED)
@@ -80,24 +80,16 @@ if DEVICE == "cuda":
 TRAIN_SUBJECTS = list(range(1, 19))
 VAL_SUBJECTS = list(range(19, 24))
 
-print("\nTraining subjects:")
-print(TRAIN_SUBJECTS)
-
-print("\nValidation subjects:")
-print(VAL_SUBJECTS)
-
-
-# ============================================================
-# First create raw training dataset
-# ============================================================
-
 CSV_FILE = (
     "data/dreamer_features/"
     "dreamer_valence_paired_all.csv"
 )
 
 
-# We first load the training subjects with their own scalers.
+# ============================================================
+# Training dataset
+# ============================================================
+
 train_dataset = DREAMERSubjectDataset(
     csv_file=CSV_FILE,
     target_subjects=TRAIN_SUBJECTS,
@@ -106,7 +98,7 @@ train_dataset = DREAMERSubjectDataset(
 
 
 # ============================================================
-# Validation uses TRAINING scalers
+# Unseen test dataset
 # ============================================================
 
 val_dataset = DREAMERSubjectDataset(
@@ -118,9 +110,8 @@ val_dataset = DREAMERSubjectDataset(
 )
 
 
-print("\nDataset sizes:")
-print("Training samples:", len(train_dataset))
-print("Validation samples:", len(val_dataset))
+print("\nTraining samples:", len(train_dataset))
+print("Test samples:", len(val_dataset))
 
 
 # ============================================================
@@ -152,13 +143,34 @@ model = QVAE().to(DEVICE)
 
 
 # ============================================================
-# Loss
+# Balanced focal loss
 # ============================================================
 
-criterion = FocalLoss(
-    alpha=0.5,
-    gamma=2
+class_counts = np.bincount(
+    train_dataset.labels.astype(int),
+    minlength=2
 )
+
+total = class_counts.sum()
+
+class_weights = (
+    total /
+    (2.0 * class_counts)
+)
+
+print("\nTraining class counts:")
+print("Class 0:", class_counts[0])
+print("Class 1:", class_counts[1])
+
+print("\nClass weights:")
+print("Class 0:", class_weights[0])
+print("Class 1:", class_weights[1])
+
+
+criterion = BalancedFocalLoss(
+    class_weights=class_weights,
+    gamma=2.0
+).to(DEVICE)
 
 
 # ============================================================
@@ -172,15 +184,11 @@ optimizer = torch.optim.AdamW(
 )
 
 
-# ============================================================
-# Scheduler
-# ============================================================
-
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
     optimizer,
     mode="max",
     factor=0.5,
-    patience=3
+    patience=4
 )
 
 
@@ -197,29 +205,32 @@ scaler = torch.cuda.amp.GradScaler(
 # Training
 # ============================================================
 
-EPOCHS = 40
+EPOCHS = 60
 
-best_accuracy = -1.0
+best_balanced_accuracy = -1.0
 
 train_history = []
 val_history = []
+balanced_history = []
+f1_history = []
+mcc_history = []
 loss_history = []
 
 
 os.makedirs(
-    "experiments/qvae_clean_baseline",
+    "experiments/qvae_balanced_clean",
     exist_ok=True
 )
 
 os.makedirs(
-    "results/clean_baseline",
+    "results/qvae_balanced_clean",
     exist_ok=True
 )
 
 
 best_model_path = (
-    "results/clean_baseline/"
-    f"clean_baseline_seed_{SEED}.pth"
+    "experiments/qvae_balanced_clean/"
+    f"best_qvae_balanced_seed_{SEED}.pth"
 )
 
 
@@ -280,6 +291,7 @@ for epoch in range(EPOCHS):
 
         running_loss += loss.item()
 
+
         predictions = torch.argmax(
             output["prediction"],
             dim=1
@@ -317,20 +329,11 @@ for epoch in range(EPOCHS):
 
         for eeg, ecg, labels in val_loader:
 
-            eeg = eeg.to(
-                DEVICE,
-                non_blocking=True
-            )
+            eeg = eeg.to(DEVICE)
 
-            ecg = ecg.to(
-                DEVICE,
-                non_blocking=True
-            )
+            ecg = ecg.to(DEVICE)
 
-            labels = labels.to(
-                DEVICE,
-                non_blocking=True
-            )
+            labels = labels.to(DEVICE)
 
 
             output = model(
@@ -386,7 +389,7 @@ for epoch in range(EPOCHS):
 
 
     scheduler.step(
-        val_accuracy
+        val_balanced_accuracy
     )
 
 
@@ -396,10 +399,10 @@ for epoch in range(EPOCHS):
     print(
         f"Epoch {epoch + 1:02d}/{EPOCHS} | "
         f"Loss: {running_loss:.4f} | "
-        f"Train Acc: {train_accuracy:.2f}% | "
-        f"Val Acc: {val_accuracy:.2f}% | "
+        f"Train: {train_accuracy:.2f}% | "
+        f"Test: {val_accuracy:.2f}% | "
+        f"Balanced: {val_balanced_accuracy:.2f}% | "
         f"Macro-F1: {val_macro_f1:.2f}% | "
-        f"Balanced Acc: {val_balanced_accuracy:.2f}% | "
         f"MCC: {val_mcc:.4f} | "
         f"LR: {current_lr:.6f}"
     )
@@ -413,18 +416,32 @@ for epoch in range(EPOCHS):
         val_accuracy
     )
 
+    balanced_history.append(
+        val_balanced_accuracy
+    )
+
+    f1_history.append(
+        val_macro_f1
+    )
+
+    mcc_history.append(
+        val_mcc
+    )
+
     loss_history.append(
         running_loss
     )
 
 
     # ========================================================
-    # Save best model
+    # Save based on balanced accuracy
     # ========================================================
 
-    if val_accuracy > best_accuracy:
+    if val_balanced_accuracy > best_balanced_accuracy:
 
-        best_accuracy = val_accuracy
+        best_balanced_accuracy = (
+            val_balanced_accuracy
+        )
 
         torch.save(
             model.state_dict(),
@@ -432,22 +449,15 @@ for epoch in range(EPOCHS):
         )
 
         print(
-            "Saved best model."
+            f"  Saved new best model: "
+            f"{best_balanced_accuracy:.2f}% balanced accuracy"
         )
 
 
 # ============================================================
-# Final results
+# Final evaluation
 # ============================================================
 
-best_epoch = int(
-    np.argmax(val_history) + 1
-)
-
-best_index = best_epoch - 1
-
-
-# Re-evaluate best checkpoint
 model.load_state_dict(
     torch.load(
         best_model_path,
@@ -466,18 +476,23 @@ with torch.no_grad():
     for eeg, ecg, labels in val_loader:
 
         eeg = eeg.to(DEVICE)
+
         ecg = ecg.to(DEVICE)
+
         labels = labels.to(DEVICE)
+
 
         output = model(
             eeg,
             ecg
         )
 
+
         predictions = torch.argmax(
             output["prediction"],
             dim=1
         )
+
 
         final_predictions.extend(
             predictions.cpu().numpy()
@@ -495,6 +510,7 @@ final_accuracy = (
     ) * 100
 )
 
+
 final_macro_f1 = (
     f1_score(
         final_targets,
@@ -503,6 +519,7 @@ final_macro_f1 = (
     ) * 100
 )
 
+
 final_balanced_accuracy = (
     balanced_accuracy_score(
         final_targets,
@@ -510,52 +527,118 @@ final_balanced_accuracy = (
     ) * 100
 )
 
+
 final_mcc = matthews_corrcoef(
     final_targets,
     final_predictions
 )
 
 
+cm = confusion_matrix(
+    final_targets,
+    final_predictions
+)
+
+
+best_epoch = int(
+    np.argmax(balanced_history) + 1
+)
+
+
+print("\n" + "=" * 70)
+print("FINAL BALANCED CLEAN QVAE")
+print("=" * 70)
+
+print(
+    f"Accuracy:          {final_accuracy:.2f}%"
+)
+
+print(
+    f"Balanced Accuracy: {final_balanced_accuracy:.2f}%"
+)
+
+print(
+    f"Macro-F1:          {final_macro_f1:.2f}%"
+)
+
+print(
+    f"MCC:               {final_mcc:.4f}"
+)
+
+print(
+    f"Best Epoch:        {best_epoch}"
+)
+
+print("\nConfusion Matrix:")
+print(cm)
+
+
+# ============================================================
+# Save results
+# ============================================================
+
 results = {
 
-    "experiment": "clean_subject_independent_qvae_baseline",
+    "experiment":
+        "balanced_clean_subject_independent_qvae",
 
-    "seed": SEED,
+    "seed":
+        SEED,
 
-    "train_subjects": TRAIN_SUBJECTS,
+    "train_subjects":
+        TRAIN_SUBJECTS,
 
-    "validation_subjects": VAL_SUBJECTS,
+    "validation_subjects":
+        VAL_SUBJECTS,
 
-    "train_samples": len(train_dataset),
+    "train_samples":
+        len(train_dataset),
 
-    "validation_samples": len(val_dataset),
+    "validation_samples":
+        len(val_dataset),
 
-    "epochs": EPOCHS,
+    "epochs":
+        EPOCHS,
 
-    "best_epoch": best_epoch,
+    "best_epoch":
+        best_epoch,
 
-    "best_validation_accuracy": final_accuracy,
+    "accuracy":
+        final_accuracy,
 
-    "macro_f1": final_macro_f1,
+    "balanced_accuracy":
+        final_balanced_accuracy,
 
-    "balanced_accuracy": final_balanced_accuracy,
+    "macro_f1":
+        final_macro_f1,
 
-    "mcc": final_mcc,
+    "mcc":
+        final_mcc,
 
-    "model_path": best_model_path,
+    "confusion_matrix":
+        cm.tolist(),
 
-    "pairing": "correct_only",
+    "class_counts":
+        class_counts.tolist(),
 
-    "scaling": (
+    "class_weights":
+        class_weights.tolist(),
+
+    "model_path":
+        best_model_path,
+
+    "pairing":
+        "correct_only",
+
+    "scaling":
         "scalers fitted on training subjects only "
         "and applied to validation subjects"
-    )
 }
 
 
 result_path = (
-    "results/clean_baseline/"
-    f"clean_baseline_seed_{SEED}.json"
+    "results/qvae_balanced_clean/"
+    f"qvae_balanced_seed_{SEED}.json"
 )
 
 
@@ -573,22 +656,37 @@ with open(
 
 history = {
 
-    "seed": SEED,
+    "seed":
+        SEED,
 
-    "train_accuracy": train_history,
+    "train_accuracy":
+        train_history,
 
-    "val_accuracy": val_history,
+    "val_accuracy":
+        val_history,
 
-    "loss": loss_history,
+    "balanced_accuracy":
+        balanced_history,
 
-    "best_epoch": best_epoch,
+    "macro_f1":
+        f1_history,
 
-    "best_validation_accuracy": final_accuracy
+    "mcc":
+        mcc_history,
+
+    "loss":
+        loss_history,
+
+    "best_epoch":
+        best_epoch,
+
+    "best_balanced_accuracy":
+        final_balanced_accuracy
 }
 
 
 history_path = (
-    "results/clean_baseline/"
+    "results/qvae_balanced_clean/"
     f"training_history_seed_{SEED}.json"
 )
 
@@ -605,22 +703,9 @@ with open(
     )
 
 
-print("\n" + "=" * 70)
-print("CLEAN BASELINE COMPLETED")
-print("=" * 70)
-
-print(f"Seed:               {SEED}")
-print(f"Best epoch:         {best_epoch}")
-print(f"Accuracy:           {final_accuracy:.2f}%")
-print(f"Macro-F1:           {final_macro_f1:.2f}%")
-print(f"Balanced Accuracy:  {final_balanced_accuracy:.2f}%")
-print(f"MCC:                {final_mcc:.4f}")
-
-print("\nModel:")
-print(best_model_path)
-
-print("\nResults:")
+print("\nResults saved:")
 print(result_path)
 
-print("\nHistory:")
 print(history_path)
+
+print("\nCompleted.")

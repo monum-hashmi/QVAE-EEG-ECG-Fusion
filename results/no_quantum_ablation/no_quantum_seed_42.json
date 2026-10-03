@@ -1,0 +1,58 @@
+{
+    "experiment": "no_quantum_subject_independent_ablation",
+    "seed": 42,
+    "train_subjects": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+    ],
+    "test_subjects": [
+        19,
+        20,
+        21,
+        22,
+        23
+    ],
+    "train_samples": 3240,
+    "test_samples": 900,
+    "epochs": 40,
+    "best_epoch": 21,
+    "accuracy": 57.333333333333336,
+    "balanced_accuracy": 51.527777777777786,
+    "macro_f1": 49.52416005047584,
+    "mcc": 0.036968577231739394,
+    "confusion_matrix": [
+        [
+            435,
+            105
+        ],
+        [
+            279,
+            81
+        ]
+    ],
+    "predicted_distribution": [
+        714,
+        186
+    ],
+    "architecture": "EEG encoder + ECG encoder + cross-attention fusion + classifier",
+    "quantum_layer": "removed",
+    "pairing": "correct_only",
+    "scaling": "scalers fitted on training subjects only and applied to unseen test subjects",
+    "model_path": "experiments/no_quantum_ablation/best_no_quantum_seed_42.pth"
+}

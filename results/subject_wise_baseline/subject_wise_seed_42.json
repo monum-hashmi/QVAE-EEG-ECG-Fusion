@@ -1,0 +1,139 @@
+{
+    "experiment": "subject_wise_clean_qvae_baseline",
+    "seed": 42,
+    "train_subjects": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+    ],
+    "test_subjects": [
+        19,
+        20,
+        21,
+        22,
+        23
+    ],
+    "checkpoint": "experiments/qvae_clean_baseline/best_qvae_clean_seed_42.pth",
+    "results": {
+        "19": {
+            "samples": 180,
+            "true_class_0": 90,
+            "true_class_1": 90,
+            "predicted_class_0": 180,
+            "predicted_class_1": 0,
+            "accuracy": 0.5,
+            "balanced_accuracy": 0.5,
+            "macro_f1": 0.3333333333333333,
+            "mcc": 0.0,
+            "confusion_matrix": [
+                [
+                    90,
+                    0
+                ],
+                [
+                    90,
+                    0
+                ]
+            ]
+        },
+        "20": {
+            "samples": 180,
+            "true_class_0": 120,
+            "true_class_1": 60,
+            "predicted_class_0": 180,
+            "predicted_class_1": 0,
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.5,
+            "macro_f1": 0.4,
+            "mcc": 0.0,
+            "confusion_matrix": [
+                [
+                    120,
+                    0
+                ],
+                [
+                    60,
+                    0
+                ]
+            ]
+        },
+        "21": {
+            "samples": 180,
+            "true_class_0": 120,
+            "true_class_1": 60,
+            "predicted_class_0": 180,
+            "predicted_class_1": 0,
+            "accuracy": 0.6666666666666666,
+            "balanced_accuracy": 0.5,
+            "macro_f1": 0.4,
+            "mcc": 0.0,
+            "confusion_matrix": [
+                [
+                    120,
+                    0
+                ],
+                [
+                    60,
+                    0
+                ]
+            ]
+        },
+        "22": {
+            "samples": 180,
+            "true_class_0": 110,
+            "true_class_1": 70,
+            "predicted_class_0": 180,
+            "predicted_class_1": 0,
+            "accuracy": 0.6111111111111112,
+            "balanced_accuracy": 0.5,
+            "macro_f1": 0.3793103448275862,
+            "mcc": 0.0,
+            "confusion_matrix": [
+                [
+                    110,
+                    0
+                ],
+                [
+                    70,
+                    0
+                ]
+            ]
+        },
+        "23": {
+            "samples": 180,
+            "true_class_0": 100,
+            "true_class_1": 80,
+            "predicted_class_0": 180,
+            "predicted_class_1": 0,
+            "accuracy": 0.5555555555555556,
+            "balanced_accuracy": 0.5,
+            "macro_f1": 0.35714285714285715,
+            "mcc": 0.0,
+            "confusion_matrix": [
+                [
+                    100,
+                    0
+                ],
+                [
+                    80,
+                    0
+                ]
+            ]
+        }
+    }
+}

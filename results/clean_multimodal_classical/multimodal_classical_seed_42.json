@@ -1,0 +1,42 @@
+{
+    "experiment": "clean_subject_independent_multimodal_classical",
+    "seed": 42,
+    "train_subjects": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+    ],
+    "test_subjects": [
+        19,
+        20,
+        21,
+        22,
+        23
+    ],
+    "train_samples": 3240,
+    "test_samples": 900,
+    "epochs": 60,
+    "best_balanced_accuracy": 50.64814814814815,
+    "accuracy": 56.99999999999999,
+    "balanced_accuracy": 50.64814814814815,
+    "macro_f1": 47.849210401409856,
+    "mcc": 0.01649015980394307,
+    "pairing": "correct_only",
+    "scaling": "scalers fitted on training subjects only and applied to unseen test subjects",
+    "model_path": "experiments/multimodal_classical/best_multimodal_classical.pth"
+}

@@ -1,0 +1,60 @@
+{
+    "experiment": "balanced_clean_subject_independent_qvae",
+    "seed": 42,
+    "train_subjects": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+    ],
+    "validation_subjects": [
+        19,
+        20,
+        21,
+        22,
+        23
+    ],
+    "train_samples": 3240,
+    "validation_samples": 900,
+    "epochs": 60,
+    "best_epoch": 3,
+    "accuracy": 59.55555555555555,
+    "balanced_accuracy": 50.78703703703704,
+    "macro_f1": 42.907334211682034,
+    "mcc": 0.032470668863702756,
+    "confusion_matrix": [
+        [
+            511,
+            29
+        ],
+        [
+            335,
+            25
+        ]
+    ],
+    "class_counts": [
+        1970,
+        1270
+    ],
+    "class_weights": [
+        0.8223350253807107,
+        1.2755905511811023
+    ],
+    "model_path": "experiments/qvae_balanced_clean/best_qvae_balanced_seed_42.pth",
+    "pairing": "correct_only",
+    "scaling": "scalers fitted on training subjects only and applied to validation subjects"
+}

@@ -36,7 +36,7 @@
     "macro_f1": 37.5,
     "balanced_accuracy": 50.0,
     "mcc": 0.0,
-    "model_path": "experiments/qvae_clean_baseline/best_qvae_clean_seed_42.pth",
+    "model_path": "results/clean_baseline/clean_baseline_seed_42.pth",
     "pairing": "correct_only",
     "scaling": "scalers fitted on training subjects only and applied to validation subjects"
 }
